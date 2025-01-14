@@ -220,4 +220,3 @@ Deletes a specific filter by its ID.
         "success": true
     }
     ```
-
