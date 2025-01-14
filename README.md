@@ -21,8 +21,8 @@ This project is a React-based application for building and managing custom filte
 
 1. Clone the repository:
     ```sh
-    git clone https://github.com/thomasculino/caltech_test.git
-    cd caltech_test
+    git clone https://github.com/thomasculino/filterBuilder.git
+    cd filterBuilder
     ```
 
 2. Install the dependencies:
