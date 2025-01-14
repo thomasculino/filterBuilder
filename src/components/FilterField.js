@@ -8,6 +8,7 @@ import {
   TextField,
   Checkbox,
   Paper,
+  Switch,
 } from '@mui/material';
 import {
   Delete,
@@ -56,6 +57,7 @@ const FilterField = ({ field, onUpdate, onRemove }) => {
     const [isDraggingOverValue, setIsDraggingOverValue] = useState(false);
     const [isDraggingOverOperator, setIsDraggingOverOperator] = useState(false);
     const [isValueField, setIsValueField] = useState(field.isValueField || true);
+    const [booleanValue, setBooleanValue] = useState(field.booleanValue !== undefined ? field.booleanValue : true);
   
     /**
      * Handles dropping an operator.
@@ -171,10 +173,9 @@ const FilterField = ({ field, onUpdate, onRemove }) => {
       <FilterStep className="filter-step" elevation={1} sx={{ 
         p: 1.5,
         bgcolor: 'pipeline.background',
-        borderLeft: '4px solid',
-        borderColor: 'primary.main',
+        borderLeft: field.isBoolean ? '4px solid orange' : '4px solid primary.main',
         '&:hover': {
-          borderColor: 'primary.dark',
+          borderColor: field.isBoolean ? 'orange' : 'primary.dark',
         }
       }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
@@ -185,7 +186,7 @@ const FilterField = ({ field, onUpdate, onRemove }) => {
             p: 1,
             bgcolor: 'grey.50',
             borderRadius: 1,
-            justifyContent: 'space-between' // Add this line to ensure the delete button is on the right
+            justifyContent: 'space-between' 
           }}>
             <Box
               sx={{ 
@@ -197,10 +198,13 @@ const FilterField = ({ field, onUpdate, onRemove }) => {
                 color: 'pipeline.text.light',
                 borderRadius: '4px',
                 minWidth: 100,
+                maxWidth: 150,
                 boxShadow: 1,
                 fontFamily: 'monospace',
                 fontSize: '0.75rem',
                 fontWeight: 500,
+                justifyContent: 'flex-start',
+                flex: 1
               }}
               draggable
               onDrop={(e) => handleFieldDrop(e, field)}
@@ -220,136 +224,164 @@ const FilterField = ({ field, onUpdate, onRemove }) => {
                 </Typography>
             </Box>
   
-            {!field.operator ? (
-              <Box 
-                sx={{ 
-                  flex: 1,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  px: 2,
-                  py: 1,
-                  border: '1.5px dashed',
-                  borderColor: 'grey.400',
-                  borderRadius: '4px',
-                  bgcolor: 'pipeline.dropZone',
-                  transition: 'all 0.2s ease',
-                  cursor: 'pointer',
-                  '&:hover': {
-                    borderColor: 'primary.main',
-                    bgcolor: 'pipeline.dropZone',
-                    borderStyle: 'solid',
-                  },
-                  fontFamily: 'monospace',
-                }}
-                onDrop={handleOperatorDrop}
-                onDragOver={(e) => e.preventDefault()}
-              >
+            {field.isBoolean ? (
+              <>
                 <Typography 
                   variant="body2" 
                   sx={{ 
                     color: 'pipeline.text.muted',
-                    fontSize: '0.75rem',
+                    fontSize: '0.875rem',
                     fontWeight: 500 
                   }}
                 >
-                  Drop operator here
+                  is
                 </Typography>
-              </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Switch
+                    checked={booleanValue}
+                    onChange={(e) => {
+                      setBooleanValue(e.target.checked);
+                      onUpdate({ booleanValue: e.target.checked });
+                    }}
+                    color="primary"
+                  />
+                  <Typography variant="body2" sx={{ fontSize: '0.875rem', fontWeight: 500 }}>
+                    {booleanValue ? 'True' : 'False'}
+                  </Typography>
+                </Box>
+              </>
             ) : (
-              <>
+              !field.operator ? (
                 <Box 
                   sx={{ 
-                    px: 1.5,
-                    py: 0.75,
-                    bgcolor: isDraggingOverOperator ? 'pipeline.operatorHover' : 'pipeline.operator',
-                    color: 'pipeline.text.light',
+                    flex: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    px: 2,
+                    py: 1,
+                    border: '1.5px dashed',
+                    borderColor: 'grey.400',
                     borderRadius: '4px',
-                    fontSize: '0.875rem',
-                    fontWeight: 500,
-                    minWidth: 40,
-                    textAlign: 'center',
-                    boxShadow: 1,
-                    transition: 'background-color 0.2s ease, transform 0.2s ease',
-                    transform: isDraggingOverOperator ? 'scale(1.05)' : 'scale(1)'
+                    bgcolor: 'pipeline.dropZone',
+                    transition: 'all 0.2s ease',
+                    cursor: 'pointer',
+                    '&:hover': {
+                      borderColor: 'primary.main',
+                      bgcolor: 'pipeline.dropZone',
+                      borderStyle: 'solid',
+                    },
+                    fontFamily: 'monospace',
                   }}
                   onDrop={handleOperatorDrop}
+                  onDragOver={(e) => e.preventDefault()}
                 >
-                  {field.operator.label}
+                  <Typography 
+                    variant="body2" 
+                    sx={{ 
+                      color: 'pipeline.text.muted',
+                      fontSize: '0.75rem',
+                      fontWeight: 500 
+                    }}
+                  >
+                    Drop operator here
+                  </Typography>
                 </Box>
-                {!isValueField ? (
-                    <Box 
-                      sx={{ 
-                        display: 'flex',
-                        alignItems: 'center',
-                        px: 1.5,
-                        py: 0.75,
-                        bgcolor: 'pipeline.field',
-                        color: 'pipeline.text.light',
-                        borderRadius: '4px',
-                        fontSize: '0.875rem',
-                        fontWeight: 500,
-                        minWidth: 100,
-                        boxShadow: 1
-                      }}
-                      draggable
-                      onDrop={(e) => handleValueDrop(e)}
-                      onDragStart={handleDragStart}
-                      onDragEnd={(e) => {
-                        handleClearValue();
-                        handleDragEnd(e);
-                      }}
-                    >
-                      <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                        {field.valueSource?.label}
-                      </Typography>
-                    </Box>
-                ) : (
-                  <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                    <TextField
-                      size="small"
-                      type="number"
-                      value={field.value || ''}
-                      onChange={(e) => onUpdate({ value: e.target.value })}
-                      placeholder="Value"
-                      sx={{
-                        width: 150,
-                        '& .MuiOutlinedInput-root': {
-                          height: 32,
-                          bgcolor: 'pipeline.background'
-                        }
-                      }}
-                      inputProps={{
-                        min: field.min,
-                        max: field.max,
-                        step: field.step
-                      }}
-                    />
-                    <Typography variant="body2" color="text.secondary">
-                      or
-                    </Typography>
-                    <ValueDropZone
-                      className="value-drop-zone"
-                      isDraggingOver={isDraggingOverValue}
-                      onDrop={handleValueDrop}
-                      onDragOver={handleValueDragOver}
-                      onDragLeave={handleValueDragLeave}
-                    >
-                      <Box sx={{ 
-                        display: 'flex', 
-                        alignItems: 'center',
-                        gap: 0.5,
-                        color: 'text.secondary'
-                      }}>
-                        <Add fontSize="small" />
-                        <Typography variant="body2" sx={{ fontSize: '0.75rem' }}>
-                          Drop filter
+              ) : (
+                <>
+                  <Box 
+                    sx={{ 
+                      px: 1.5,
+                      py: 0.75,
+                      bgcolor: isDraggingOverOperator ? 'pipeline.operatorHover' : 'pipeline.operator',
+                      color: 'pipeline.text.light',
+                      borderRadius: '4px',
+                      fontSize: '0.875rem',
+                      fontWeight: 500,
+                      minWidth: 40,
+                      textAlign: 'center',
+                      boxShadow: 1,
+                      transition: 'background-color 0.2s ease, transform 0.2s ease',
+                      transform: isDraggingOverOperator ? 'scale(1.05)' : 'scale(1)'
+                    }}
+                    onDrop={handleOperatorDrop}
+                  >
+                    {field.operator.label}
+                  </Box>
+                  {!isValueField ? (
+                      <Box 
+                        sx={{ 
+                          display: 'flex',
+                          alignItems: 'center',
+                          px: 1.5,
+                          py: 0.75,
+                          bgcolor: 'pipeline.field',
+                          color: 'pipeline.text.light',
+                          borderRadius: '4px',
+                          fontSize: '0.875rem',
+                          fontWeight: 500,
+                          minWidth: 100,
+                          boxShadow: 1
+                        }}
+                        draggable
+                        onDrop={(e) => handleValueDrop(e)}
+                        onDragStart={handleDragStart}
+                        onDragEnd={(e) => {
+                          handleClearValue();
+                          handleDragEnd(e);
+                        }}
+                      >
+                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                          {field.valueSource?.label}
                         </Typography>
                       </Box>
-                    </ValueDropZone>
-                  </Box>
-                )}
-              </>
+                  ) : (
+                    <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                      <TextField
+                        size="small"
+                        type="number"
+                        value={field.value || ''}
+                        onChange={(e) => onUpdate({ value: e.target.value })}
+                        placeholder="Value"
+                        sx={{
+                          width: 150,
+                          '& .MuiOutlinedInput-root': {
+                            height: 32,
+                            bgcolor: 'pipeline.background'
+                          }
+                        }}
+                        inputProps={{
+                          min: field.min,
+                          max: field.max,
+                          step: field.step
+                        }}
+                      />
+                      <Typography variant="body2" color="text.secondary">
+                        or
+                      </Typography>
+                      <ValueDropZone
+                        className="value-drop-zone"
+                        isDraggingOver={isDraggingOverValue}
+                        onDrop={handleValueDrop}
+                        onDragOver={handleValueDragOver}
+                        onDragLeave={handleValueDragLeave}
+                      >
+                        <Box sx={{ 
+                          display: 'flex', 
+                          alignItems: 'center',
+                          gap: 0.5,
+                          color: 'text.secondary'
+                        }}>
+                          <Add fontSize="small" />
+                          <Typography variant="body2" sx={{ fontSize: '0.75rem' }}>
+                            Drop filter
+                          </Typography>
+                        </Box>
+                      </ValueDropZone>
+                    </Box>
+                  )}
+                </>
+              )
             )}
             <IconButton 
               size="small" 
@@ -401,6 +433,8 @@ FilterField.propTypes = {
     min: PropTypes.number,
     max: PropTypes.number,
     step: PropTypes.number,
+    isBoolean: PropTypes.bool,
+    booleanValue: PropTypes.bool,
   }).isRequired,
   onUpdate: PropTypes.func.isRequired,
   onRemove: PropTypes.func.isRequired,

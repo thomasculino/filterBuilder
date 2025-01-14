@@ -208,13 +208,31 @@ const FilterBuilder = () => {
     }
 
     for (const step of steps) {
-      if (!step.field || !step.operator || (!step.value && step.value !== undefined)) {
-        setSaveError('All steps must have a field, operator, and value');
-        return false;
+      console.log(step);
+      if (!step.isBoolean) {
+        if (!step.field || !step.operator || (!step.value && step.value !== undefined)) {
+          setSaveError('All steps must have a field, operator, and value');
+          return false;
+        }
       }
     }
 
     return true;
+  };
+
+  /**
+   * Checks if the filter result is boolean based on the steps and operators.
+   * @returns {boolean} True if the result is boolean, false otherwise.
+   */
+  const isBooleanResult = () => {
+    for (const step of steps) {
+      if (step.operator && ['eq', 'ne', 'gt', 'gte', 'lt', 'lte'].includes(step.operator.operator)) {
+        if (step.value !== undefined || step.isValueField) {
+          return true;
+        }
+      }
+    }
+    return false;
   };
 
   /**
@@ -230,16 +248,27 @@ const FilterBuilder = () => {
       const canvas = await html2canvas(filterPipelineRef.current);
       const screenshot = canvas.toDataURL();
 
+      const stepsWithBooleanValues = steps.map(step => {
+        if (step.isBoolean) {
+          return {
+            ...step,
+            booleanValue: step.booleanValue !== undefined ? step.booleanValue : true
+          };
+        }
+        return step;
+      });
+
       const response = await fetch("http://localhost:5001/save-filter", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           label: filterName,
           description: `Filter with ${steps.length} conditions`,
-          steps,
+          steps: stepsWithBooleanValues,
           operators,
           type: 'customFilter',
           screenshot,
+          isBoolean: isBooleanResult(), 
         }),
       });
 
@@ -306,12 +335,13 @@ const FilterBuilder = () => {
           const newSteps = [...steps];
           newSteps[stepIndex] = {
             ...newSteps[stepIndex],
-            value: data.label,
+            value: data.isBoolean ? data.label : data.label,
             fieldReference: data._id.$oid || data.id,
             isValueField: false,
             type: 'customFilter',
             parentOperator: parentStep.operator?.operator,
-            parentValue: parentStep.value
+            parentValue: parentStep.value,
+            isBoolean: data.isBoolean // Add this line
           };
           setSteps(newSteps);
           return;
