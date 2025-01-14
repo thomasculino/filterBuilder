@@ -929,7 +929,7 @@ const FilterBuilder = () => {
                   '& .MuiButton-root': {
                     minHeight: 40,
                     px: 2,
-                    mr: 2, // Add negative margin to shift button left
+                    mr: 2, 
                   },
                   '& .MuiIconButton-root': {
                     width: 40,
