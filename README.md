@@ -77,11 +77,11 @@ If you want to populate the MongoDB database with sample data, you can use the p
 
 1. Open your browser and navigate to `http://localhost:3000`.
 2. Use the interface to create, manage, and run custom filters.
-3. See some examples:
-   1. [Create a Filter Step](#create-filter-step)
-   2. [Save Custom Filter](#save-custom-filter)
-   3. [Create a Complex Query](#create-a-complex-query)
-   4. [Run a Query](#run-a-query)
+3. See some examples:<br />
+   - [Create a Filter Step](#create-filter-step)
+   - [Save Custom Filter](#save-custom-filter)
+   - [Create a Complex Query](#create-a-complex-query)
+   - [Run a Query](#run-a-query)
 
 ### Create Filter Step
 
