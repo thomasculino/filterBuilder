@@ -8,6 +8,7 @@ This project is a React-based application for building and managing custom filte
 - [Usage](#usage)
 - [Project Structure](#project-structure)
 - [API Endpoints](#api-endpoints)
+- [Note](#note)
   
 ## Installation
 
@@ -220,3 +221,8 @@ Deletes a specific filter by its ID.
         "success": true
     }
     ```
+
+## Note
+
+All the operators are not functional yet. They require more backend work. Only the comparison and math ones are currently functioning as intended.
+
